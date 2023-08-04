@@ -90,11 +90,11 @@ func (s *Server) handleHistoryText(u *objects.Update) {
 }
 
 func (s *Server) handleHistoryChart(u *objects.Update) {
-	s.sendHistoryChart(u, 72)
+	s.sendHistoryChart(u, s.limits.History.Short)
 }
 
 func (s *Server) handleLongHistoryChart(u *objects.Update) {
-	s.sendHistoryChart(u, 0)
+	s.sendHistoryChart(u, s.limits.History.Long)
 }
 
 func (s *Server) sendHistoryChart(u *objects.Update, limit int) {

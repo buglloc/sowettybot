@@ -16,7 +16,6 @@ type Telegram struct {
 }
 
 type History struct {
-	Limit       int    `yaml:"limit"`
 	StorageFile string `yaml:"storage_file"`
 }
 
@@ -26,12 +25,23 @@ type Exchange struct {
 	Route string `yaml:"route"`
 }
 
+type HistoryLimits struct {
+	Overall int `yaml:"overall"`
+	Short   int `yaml:"short"`
+	Long    int `yaml:"long"`
+}
+
+type Limits struct {
+	History HistoryLimits `yaml:"history"`
+}
+
 type Config struct {
 	Debug     bool       `yaml:"debug"`
 	RateIT    RateIT     `yaml:"rate_it"`
 	Telegram  Telegram   `yaml:"telegram"`
 	History   History    `yaml:"history"`
 	Exchanges []Exchange `yaml:"exchanges"`
+	Limits    Limits     `yaml:"limits"`
 }
 
 func LoadConfig(configs ...string) (*Config, error) {
@@ -43,8 +53,12 @@ func LoadConfig(configs ...string) (*Config, error) {
 		Telegram: Telegram{
 			APIKey: os.Getenv("TG_TOKEN"),
 		},
-		History: History{
-			Limit: 48,
+		Limits: Limits{
+			History: HistoryLimits{
+				Overall: 1000,
+				Short:   72,
+				Long:    0,
+			},
 		},
 		Exchanges: []Exchange{
 			{

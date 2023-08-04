@@ -23,6 +23,7 @@ type Server struct {
 	history    *history.History
 	renderer   *renderer.HistoryRenderer
 	exchanges  []config.Exchange
+	limits     config.Limits
 	ratesCache *ttlcache.Cache[string, models.Rate]
 	closed     chan struct{}
 	ctx        context.Context
@@ -55,9 +56,10 @@ func NewServer(cfg *config.Config) (*Server, error) {
 	return &Server{
 		bot:       bot,
 		rtc:       rtc,
-		history:   history.NewHistory(cfg.History.StorageFile, cfg.History.Limit),
+		history:   history.NewHistory(cfg.History.StorageFile, cfg.Limits.History.Overall),
 		renderer:  renderer.NewHistoryRenderer(),
 		exchanges: cfg.Exchanges,
+		limits:    cfg.Limits,
 		ratesCache: ttlcache.New[string, models.Rate](
 			ttlcache.WithTTL[string, models.Rate](5 * time.Minute),
 		),
