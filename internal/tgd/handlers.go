@@ -137,8 +137,8 @@ func (s *Server) sendHistoryChart(u *objects.Update, limit int) {
 			u.Message.MessageId,
 			fmt.Sprintf(
 				"`%s -> %s`",
-				startDate.Format("02 Jan 15:04"),
-				endDate.Format("02 Jan 15:04"),
+				startDate.Format("02 Jan 15:04 MST"),
+				endDate.Format("02 Jan 15:04 MST"),
 			),
 			tgMdMode,
 		)
