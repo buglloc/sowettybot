@@ -48,6 +48,11 @@ func NewService(cfg *config.Config) (*Service, error) {
 		return nil, fmt.Errorf("unable to create bot: %w", err)
 	}
 
+	notifications := make([]*Notification, len(cfg.Notifier.Notifications))
+	for i, n := range cfg.Notifier.Notifications {
+		notifications[i] = NewNotification(n)
+	}
+
 	bw := &BotWrapper{Bot: bot}
 	hist := history.NewHistory(cfg.History.StorageFile, cfg.Limits.History.Overall)
 
@@ -67,7 +72,7 @@ func NewService(cfg *config.Config) (*Service, error) {
 		notifier: &Notifier{
 			bot:           bw,
 			history:       hist,
-			notifications: cfg.Notifier.Notifications,
+			notifications: notifications,
 			checkPeriod:   cfg.Notifier.CheckPeriod,
 		},
 		bot:       bw,
