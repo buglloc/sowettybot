@@ -1,0 +1,6 @@
+```
+{{- range $rate := .}}
+----- {{ $rate.Name }} on {{ $rate.When.Format "15:04 MST" }} -----
+{{ $rate.Rate | FormatRate }}
+{{end}}
+```

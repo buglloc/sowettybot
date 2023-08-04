@@ -1,0 +1,3 @@
+history:
+  limit: 96
+  storage_file: /var/www/html/rates.txt

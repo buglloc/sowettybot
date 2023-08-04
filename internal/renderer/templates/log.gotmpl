@@ -1,0 +1,5 @@
+```
+{{- range $entry := .}}
+{{ $entry.When.Format "15:04 MST" }}{{"\t"}}{{range $i, $name := $entry.Names}}{{ printf "%.2f" (index $entry.Values $i) }} ({{ slice $name  0 1}}){{"\t"}}{{end}}
+{{- end}}
+```
