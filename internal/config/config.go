@@ -35,13 +35,19 @@ type Limits struct {
 	History HistoryLimits `yaml:"history"`
 }
 
+type Notification struct {
+	Rate   float64 `yaml:"rate"`
+	ChatID int     `yaml:"chat_id"`
+}
+
 type Config struct {
-	Debug     bool       `yaml:"debug"`
-	RateIT    RateIT     `yaml:"rate_it"`
-	Telegram  Telegram   `yaml:"telegram"`
-	History   History    `yaml:"history"`
-	Exchanges []Exchange `yaml:"exchanges"`
-	Limits    Limits     `yaml:"limits"`
+	Debug         bool           `yaml:"debug"`
+	RateIT        RateIT         `yaml:"rate_it"`
+	Telegram      Telegram       `yaml:"telegram"`
+	History       History        `yaml:"history"`
+	Exchanges     []Exchange     `yaml:"exchanges"`
+	Limits        Limits         `yaml:"limits"`
+	Notifications []Notification `yaml:"notifications"`
 }
 
 func LoadConfig(configs ...string) (*Config, error) {

@@ -11,7 +11,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 
-	"github.com/buglloc/sowettybot/internal/tgd"
+	"github.com/buglloc/sowettybot/internal/service"
 )
 
 var startCmd = &cobra.Command{
@@ -20,7 +20,7 @@ var startCmd = &cobra.Command{
 	SilenceErrors: true,
 	Short:         "Starts bot",
 	RunE: func(_ *cobra.Command, _ []string) error {
-		app, err := tgd.NewServer(cfg)
+		app, err := service.NewService(cfg)
 		if err != nil {
 			return fmt.Errorf("unable to create httpd service: %w", err)
 		}
