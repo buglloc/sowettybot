@@ -37,8 +37,8 @@ type Limits struct {
 }
 
 type Notification struct {
-	Rate   float64 `yaml:"rate"`
-	ChatID int     `yaml:"chat_id"`
+	Threshold float64 `yaml:"threshold"`
+	ChatID    int     `yaml:"chat_id"`
 }
 
 type Notifier struct {

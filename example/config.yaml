@@ -1,6 +1,8 @@
 history:
   limit: 96
   storage_file: /var/www/html/rates.txt
-notifications:
-  - rate: 3.0
-    chat_id: 215566004
+notifier:
+  check_period: 10m
+  notifications:
+    - rate: 3.0
+      chat_id: 215566004

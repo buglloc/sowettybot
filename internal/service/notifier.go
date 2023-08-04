@@ -25,10 +25,12 @@ func (n *Notifier) Initialize() error {
 }
 
 func (n *Notifier) Tick() {
-	if time.Since(n.lastTick) < n.checkPeriod {
+	now := time.Now()
+	if now.Sub(n.lastTick) < n.checkPeriod {
 		return
 	}
 
+	n.lastTick = now
 	entries, err := n.history.Entries(1)
 	if err != nil {
 		log.Error().Err(err).Msg("unable to get history")
@@ -44,16 +46,17 @@ func (n *Notifier) Tick() {
 		return
 	}
 
+	n.lastCheck = now
 	var notification strings.Builder
 	for _, cfg := range n.notifications {
 		notification.Reset()
 		for i, v := range entry.Values {
-			if v > cfg.Rate {
+			if v > cfg.Threshold {
 				continue
 			}
 
 			if notification.Len() == 0 {
-				notification.WriteString("YAY! Good exchange rate!\n")
+				_, _ = fmt.Fprintf(&notification, "YAY! Nice exchange rate (threshold is %d)!\n", cfg.Threshold)
 			}
 			_, _ = fmt.Fprintf(&notification, "%s: %.2f\n", entry.Names[i], v)
 		}
