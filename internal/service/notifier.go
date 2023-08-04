@@ -60,7 +60,7 @@ func (n *Notifier) Tick() {
 			}
 
 			if notification.Len() == 0 {
-				_, _ = fmt.Fprintf(&notification, "YAY! Nice exchange rate (threshold is %d)!\n", cfg.Threshold)
+				_, _ = fmt.Fprintf(&notification, "YAY! Nice exchange rate (threshold is %.2f)!\n", cfg.Threshold)
 			}
 			_, _ = fmt.Fprintf(&notification, "%s: %.2f\n", entry.Names[i], v)
 		}
