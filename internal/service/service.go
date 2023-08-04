@@ -1,4 +1,4 @@
-package tgd
+package service
 
 import (
 	"context"
@@ -17,20 +17,15 @@ import (
 	"github.com/buglloc/sowettybot/internal/renderer"
 )
 
-type Server struct {
-	bot        *telego.Bot
-	rtc        *rateit.Client
-	history    *history.History
-	renderer   *renderer.HistoryRenderer
-	exchanges  []config.Exchange
-	limits     config.Limits
-	ratesCache *ttlcache.Cache[string, models.Rate]
-	closed     chan struct{}
-	ctx        context.Context
-	cancelCtx  context.CancelFunc
+type Service struct {
+	handlers  *CommandsHandler
+	bot       *BotWrapper
+	closed    chan struct{}
+	ctx       context.Context
+	cancelCtx context.CancelFunc
 }
 
-func NewServer(cfg *config.Config) (*Server, error) {
+func NewService(cfg *config.Config) (*Service, error) {
 	rtc, err := rateit.NewClient(
 		rateit.WithUpstream(cfg.RateIT.Upstream),
 	)
@@ -51,32 +46,36 @@ func NewServer(cfg *config.Config) (*Server, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to create bot: %w", err)
 	}
+	bw := &BotWrapper{Bot: bot}
 
 	ctx, cancel := context.WithCancel(context.Background())
-	return &Server{
-		bot:       bot,
-		rtc:       rtc,
-		history:   history.NewHistory(cfg.History.StorageFile, cfg.Limits.History.Overall),
-		renderer:  renderer.NewHistoryRenderer(),
-		exchanges: cfg.Exchanges,
-		limits:    cfg.Limits,
-		ratesCache: ttlcache.New[string, models.Rate](
-			ttlcache.WithTTL[string, models.Rate](5 * time.Minute),
-		),
+	return &Service{
+		handlers: &CommandsHandler{
+			bot:       bw,
+			rtc:       rtc,
+			history:   history.NewHistory(cfg.History.StorageFile, cfg.Limits.History.Overall),
+			renderer:  renderer.NewHistoryRenderer(),
+			exchanges: cfg.Exchanges,
+			limits:    cfg.Limits,
+			ratesCache: ttlcache.New[string, models.Rate](
+				ttlcache.WithTTL[string, models.Rate](5 * time.Minute),
+			),
+		},
+		bot:       bw,
 		closed:    make(chan struct{}),
 		ctx:       ctx,
 		cancelCtx: cancel,
 	}, nil
 }
 
-func (s *Server) Start() error {
+func (s *Service) Start() error {
 	if err := s.bot.Run(); err != nil {
 		return fmt.Errorf("run failed: %w", err)
 	}
 
 	defer close(s.closed)
 
-	if err := s.initHandlers(); err != nil {
+	if err := s.handlers.Initialize(); err != nil {
 		return fmt.Errorf("unable to register handlers: %w", err)
 	}
 
@@ -88,7 +87,7 @@ func (s *Server) Start() error {
 	for {
 		select {
 		case <-cacheTicker.C:
-			s.ratesCache.DeleteExpired()
+			s.handlers.Tick()
 		case u := <-updateChannel:
 			_, _ = s.bot.SendMessage(u.Message.Chat.Id, "Sorry, unsupported command", "", u.Message.MessageId, false, false)
 		case <-s.ctx.Done():
@@ -97,7 +96,7 @@ func (s *Server) Start() error {
 	}
 }
 
-func (s *Server) Shutdown(ctx context.Context) error {
+func (s *Service) Shutdown(ctx context.Context) error {
 	s.cancelCtx()
 
 	select {
