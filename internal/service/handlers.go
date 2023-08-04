@@ -31,6 +31,7 @@ type CommandsHandler struct {
 func (h *CommandsHandler) Initialize() error {
 	toRegister := map[string]func(u *objects.Update){
 		"/start":       h.handleStart,
+		"/chatid":      h.handleChatID,
 		"/rates":       h.handleRates,
 		"/history":     h.handleHistoryChart,
 		"/longhistory": h.handleLongHistoryChart,
@@ -54,6 +55,17 @@ func (h *CommandsHandler) handleStart(u *objects.Update) {
 	err := h.bot.SendMdMessage(
 		u.Message.Chat.Id,
 		"Nice to see you, type /history to get exchange rates history ;)",
+		u.Message.MessageId,
+	)
+	if err != nil {
+		log.Error().Err(err).Int("chat_id", u.Message.Chat.Id).Msg("unable to send reply")
+	}
+}
+
+func (h *CommandsHandler) handleChatID(u *objects.Update) {
+	err := h.bot.SendMdMessage(
+		u.Message.Chat.Id,
+		fmt.Sprintf("chat id: `%d`", u.Message.Chat.Id),
 		u.Message.MessageId,
 	)
 	if err != nil {
