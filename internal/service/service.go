@@ -19,6 +19,7 @@ import (
 
 type Service struct {
 	handlers  *CommandsHandler
+	notifier  *Notifier
 	bot       *BotWrapper
 	closed    chan struct{}
 	ctx       context.Context
@@ -46,20 +47,28 @@ func NewService(cfg *config.Config) (*Service, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to create bot: %w", err)
 	}
+
 	bw := &BotWrapper{Bot: bot}
+	hist := history.NewHistory(cfg.History.StorageFile, cfg.Limits.History.Overall)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	return &Service{
 		handlers: &CommandsHandler{
 			bot:       bw,
 			rtc:       rtc,
-			history:   history.NewHistory(cfg.History.StorageFile, cfg.Limits.History.Overall),
+			history:   hist,
 			renderer:  renderer.NewHistoryRenderer(),
 			exchanges: cfg.Exchanges,
 			limits:    cfg.Limits,
 			ratesCache: ttlcache.New[string, models.Rate](
 				ttlcache.WithTTL[string, models.Rate](5 * time.Minute),
 			),
+		},
+		notifier: &Notifier{
+			bot:           bw,
+			history:       hist,
+			notifications: cfg.Notifier.Notifications,
+			checkPeriod:   cfg.Notifier.CheckPeriod,
 		},
 		bot:       bw,
 		closed:    make(chan struct{}),
@@ -75,19 +84,24 @@ func (s *Service) Start() error {
 
 	defer close(s.closed)
 
+	if err := s.notifier.Initialize(); err != nil {
+		return fmt.Errorf("unable to register handlers: %w", err)
+	}
+
 	if err := s.handlers.Initialize(); err != nil {
 		return fmt.Errorf("unable to register handlers: %w", err)
 	}
 
-	cacheTicker := time.NewTicker(30 * time.Minute)
-	defer cacheTicker.Stop()
+	updateTicker := time.NewTicker(1 * time.Minute)
+	defer updateTicker.Stop()
 
 	//Monitores any other update
 	updateChannel := *s.bot.GetUpdateChannel()
 	for {
 		select {
-		case <-cacheTicker.C:
+		case <-updateTicker.C:
 			s.handlers.Tick()
+			s.notifier.Tick()
 		case u := <-updateChannel:
 			_, _ = s.bot.SendMessage(u.Message.Chat.Id, "Sorry, unsupported command", "", u.Message.MessageId, false, false)
 		case <-s.ctx.Done():

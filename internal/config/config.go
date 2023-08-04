@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"gopkg.in/yaml.v3"
 )
@@ -40,14 +41,19 @@ type Notification struct {
 	ChatID int     `yaml:"chat_id"`
 }
 
-type Config struct {
-	Debug         bool           `yaml:"debug"`
-	RateIT        RateIT         `yaml:"rate_it"`
-	Telegram      Telegram       `yaml:"telegram"`
-	History       History        `yaml:"history"`
-	Exchanges     []Exchange     `yaml:"exchanges"`
-	Limits        Limits         `yaml:"limits"`
+type Notifier struct {
+	CheckPeriod   time.Duration  `yaml:"check_period"`
 	Notifications []Notification `yaml:"notifications"`
+}
+
+type Config struct {
+	Debug     bool       `yaml:"debug"`
+	RateIT    RateIT     `yaml:"rate_it"`
+	Telegram  Telegram   `yaml:"telegram"`
+	Notifier  Notifier   `yaml:"notifier"`
+	History   History    `yaml:"history"`
+	Exchanges []Exchange `yaml:"exchanges"`
+	Limits    Limits     `yaml:"limits"`
 }
 
 func LoadConfig(configs ...string) (*Config, error) {
@@ -65,6 +71,9 @@ func LoadConfig(configs ...string) (*Config, error) {
 				Short:   72,
 				Long:    0,
 			},
+		},
+		Notifier: Notifier{
+			CheckPeriod: 10 * time.Minute,
 		},
 		Exchanges: []Exchange{
 			{
