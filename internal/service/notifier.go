@@ -7,14 +7,13 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/buglloc/sowettybot/internal/config"
 	"github.com/buglloc/sowettybot/internal/history"
 )
 
 type Notifier struct {
 	bot           *BotWrapper
 	history       *history.History
-	notifications []config.Notification
+	notifications []*Notification
 	checkPeriod   time.Duration
 	lastTick      time.Time
 	lastCheck     time.Time
@@ -50,9 +49,14 @@ func (n *Notifier) Tick() {
 	var notification strings.Builder
 	for _, cfg := range n.notifications {
 		notification.Reset()
+		minRate := 0.0
 		for i, v := range entry.Values {
-			if v > cfg.Threshold {
+			if !cfg.ShouldNotify(v) {
 				continue
+			}
+
+			if v < minRate {
+				minRate = v
 			}
 
 			if notification.Len() == 0 {
@@ -66,6 +70,8 @@ func (n *Notifier) Tick() {
 			err := n.bot.SendMdMessage(cfg.ChatID, msg, 0)
 			if err != nil {
 				log.Error().Err(err).Str("message", msg).Msg("unable to send notification")
+			} else {
+				cfg.Notified(minRate)
 			}
 		}
 	}
