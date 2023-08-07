@@ -9,7 +9,7 @@ require (
 	github.com/jellydator/ttlcache/v3 v3.0.1
 	github.com/rs/zerolog v1.30.0
 	github.com/spf13/cobra v1.7.0
-	github.com/stretchr/testify v1.7.1
+	github.com/stretchr/testify v1.8.4
 	github.com/wcharczuk/go-chart v2.0.1+incompatible
 	go.uber.org/automaxprocs v1.5.3
 	gopkg.in/yaml.v3 v3.0.1
