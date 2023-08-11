@@ -9,6 +9,7 @@ import (
 	"github.com/SakoDroid/telego"
 	"github.com/SakoDroid/telego/configs"
 	"github.com/jellydator/ttlcache/v3"
+	"github.com/rs/zerolog/log"
 
 	"github.com/buglloc/sowettybot/internal/config"
 	"github.com/buglloc/sowettybot/internal/history"
@@ -108,7 +109,11 @@ func (s *Service) Start() error {
 			s.handlers.Tick()
 			s.notifier.Tick()
 		case u := <-updateChannel:
-			_, _ = s.bot.SendMessage(u.Message.Chat.Id, "Sorry, unsupported command", "", u.Message.MessageId, false, false)
+			if u.Message != nil {
+				_, _ = s.bot.SendMessage(u.Message.Chat.Id, "Sorry, unsupported command", "", u.Message.MessageId, false, false)
+			}
+
+			log.Warn().Str("type", u.GetType()).Msg("receive unsupported update")
 		case <-s.ctx.Done():
 			return nil
 		}
