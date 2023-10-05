@@ -1,5 +1,9 @@
+limits:
+  history:
+    overall: 1000
+    short: 72
+    long: 0
 history:
-  limit: 96
   storage_file: /var/www/html/rates.txt
 notifier:
   check_period: 10m
