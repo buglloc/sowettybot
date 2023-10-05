@@ -39,7 +39,8 @@ func (h *CommandsHandler) Initialize() error {
 	}
 
 	for pattern, handler := range toRegister {
-		if err := h.bot.AddHandler(pattern, handler, "private"); err != nil {
+		wrappedHandler := h.panicMiddleware(pattern, handler)
+		if err := h.bot.AddHandler(pattern, wrappedHandler, "private"); err != nil {
 			return fmt.Errorf("unable to register handler %q: %w", pattern, err)
 		}
 	}
@@ -220,4 +221,28 @@ func (h *CommandsHandler) renderRates() (string, error) {
 	}
 
 	return reply, nil
+}
+
+func (h *CommandsHandler) panicMiddleware(name string, next func(*objects.Update)) func(*objects.Update) {
+	return func(u *objects.Update) {
+		defer func() {
+			if err := recover(); err != nil {
+				log.Error().
+					Any("err", err).
+					Str("handler", name).
+					Msg("panic occurred")
+
+				err := h.bot.SendMdMessage(
+					u.Message.Chat.Id,
+					fmt.Sprintf("ooops:\n```\n%+v\n```", err),
+					u.Message.MessageId,
+				)
+				if err != nil {
+					log.Error().Err(err).Int("chat_id", u.Message.Chat.Id).Msg("unable to send panic reply")
+				}
+			}
+		}()
+
+		next(u)
+	}
 }
