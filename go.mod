@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/SakoDroid/telego v1.8.0
-	github.com/go-resty/resty/v2 v2.10.0
+	github.com/go-resty/resty/v2 v2.11.0
 	github.com/icza/backscanner v0.0.0-20230330133933-bf6beb754c70
 	github.com/jellydator/ttlcache/v3 v3.2.0
 	github.com/rs/zerolog v1.32.0
