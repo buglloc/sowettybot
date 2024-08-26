@@ -6,7 +6,7 @@ require (
 	github.com/SakoDroid/telego v1.8.0
 	github.com/go-resty/resty/v2 v2.14.0
 	github.com/icza/backscanner v0.0.0-20230330133933-bf6beb754c70
-	github.com/jellydator/ttlcache/v3 v3.2.0
+	github.com/jellydator/ttlcache/v3 v3.2.1
 	github.com/rs/zerolog v1.33.0
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.9.0
@@ -26,6 +26,6 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	golang.org/x/image v0.10.0 // indirect
 	golang.org/x/net v0.27.0 // indirect
-	golang.org/x/sync v0.7.0 // indirect
+	golang.org/x/sync v0.8.0 // indirect
 	golang.org/x/sys v0.22.0 // indirect
 )
