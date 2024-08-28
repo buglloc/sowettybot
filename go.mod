@@ -6,7 +6,7 @@ require (
 	github.com/SakoDroid/telego v1.8.0
 	github.com/go-resty/resty/v2 v2.14.0
 	github.com/icza/backscanner v0.0.0-20230330133933-bf6beb754c70
-	github.com/jellydator/ttlcache/v3 v3.2.1
+	github.com/jellydator/ttlcache/v3 v3.3.0
 	github.com/rs/zerolog v1.33.0
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.9.0
