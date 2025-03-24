@@ -7,7 +7,7 @@ require (
 	github.com/go-resty/resty/v2 v2.16.5
 	github.com/icza/backscanner v0.0.0-20230330133933-bf6beb754c70
 	github.com/jellydator/ttlcache/v3 v3.3.0
-	github.com/rs/zerolog v1.33.0
+	github.com/rs/zerolog v1.34.0
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.9.0
 	github.com/wcharczuk/go-chart v2.0.1+incompatible
